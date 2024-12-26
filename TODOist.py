@@ -20,7 +20,13 @@ tab_view.pack(fill="both", expand=True)
 
 # Tasks Tab
 tasks_tab = tab_view.add("Tasks")
-add_task_button = ctk.CTkButton(tasks_tab, text="Add Task", command=lambda: open_add_task_window(tasks_tree, root), fg_color="#4B0082", text_color="#FFFFFF")
+button_frame = ctk.CTkFrame(tasks_tab, fg_color="#2C2C2C")
+button_frame.pack(fill="x", pady=10)
+
+add_task_button = ctk.CTkButton(button_frame, text="Add Task", command=lambda: open_add_task_window(tasks_tree, root), fg_color="#4B0082", text_color="#FFFFFF")
+delete_task_button = ctk.CTkButton(button_frame, text="Delete Task", command=lambda: delete_selected_tasks(tasks_tree), fg_color="#1E1E1E", text_color="#FFFFFF")
+add_task_button.pack(side="left", padx=5)
+delete_task_button.pack(side="left", padx=5)
 add_task_button.pack(pady=10)
 
 tasks_frame = ctk.CTkFrame(tasks_tab, fg_color="#2C2C2C")
@@ -50,6 +56,19 @@ tasks_tree.heading("Due", text="Due", command=lambda: sort_column(tasks_tree, "D
 tasks_tree.pack(fill="both", expand=True)
 
 # Double-click to open task details
+def delete_selected_tasks(tree):
+    selected_items = tree.selection()
+    connection = sqlite3.connect("tasks.db")
+    cursor = connection.cursor()
+
+    for item in selected_items:
+        task_title = tree.item(item, 'values')[0]
+        cursor.execute("DELETE FROM tasks WHERE title = ?", (task_title,))
+        tree.delete(item)
+
+    connection.commit()
+    connection.close()
+
 def on_task_double_click(event):
     selected_item = tasks_tree.selection()
     if selected_item:
@@ -63,7 +82,7 @@ style = ttk.Style()
 style.theme_use("default")
 style.configure("Treeview", background="#3C3C3C", foreground="#FFFFFF", fieldbackground="#3C3C3C")
 style.configure("Treeview.Heading", background="#4B0082", foreground="#FFFFFF")
-style.map("Treeview.Heading", background=[("active", "#4B0082")], foreground=[("active", "#FFFFFF")])
+style.map("Treeview.Heading", background=[("active", "#3A0066")], foreground=[("active", "#FFFFFF")])
 style.map("Treeview", background=[("selected", "#4B0082")], foreground=[("selected", "#FFFFFF")])
 
 # Load tasks from database

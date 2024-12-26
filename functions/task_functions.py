@@ -66,11 +66,11 @@ def open_add_task_window(tasks_tree, root):
     task_description_entry.bind("<FocusIn>", remove_placeholder_text)
     task_description_entry.bind("<FocusOut>", add_placeholder_text)
 
-    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Low", "Medium", "High"])
+    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Lowest", "Low", "Medium", "High", "Highest"])
     priority_combobox.set("Select Priority")
     priority_combobox.pack(pady=5)
 
-    category_combobox = ctk.CTkComboBox(add_task_window, values=["Work", "Study", "Personal Life"])
+    category_combobox = ctk.CTkComboBox(add_task_window, values=["Work", "Study", "Personal Life", "Workout"])
     category_combobox.set("Select Category")
     category_combobox.pack(pady=5)
 
@@ -133,11 +133,11 @@ def open_task_details_window(tasks_tree,root,task_title):
         task_description_entry.insert("1.0", task[2])
         task_description_entry.pack(pady=10)
 
-        priority_combobox = ctk.CTkComboBox(details_window, values=["Low", "Medium", "High"])
+        priority_combobox = ctk.CTkComboBox(details_window, values=["Lowest", "Low", "Medium", "High", "Highest"])
         priority_combobox.set(task[3])
         priority_combobox.pack(pady=5)
 
-        category_combobox = ctk.CTkComboBox(details_window, values=["Work", "Study", "Personal Life"])
+        category_combobox = ctk.CTkComboBox(details_window, values=["Work", "Study", "Personal Life", "Workout"])
         category_combobox.set(task[4])
         category_combobox.pack(pady=5)
 
