@@ -22,7 +22,9 @@ def initialize_database():
                         description TEXT,
                         priority TEXT,
                         category TEXT,
-                        due_date TEXT
+                        due_date TEXT,
+                        day_difference TEXT,
+                        result TEXT
                     )''')
     connection.commit()
     connection.close()
