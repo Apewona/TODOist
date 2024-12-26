@@ -1,57 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
-from tkcalendar import Calendar
-
-def open_add_task_window():
-    def save_task():
-        task_title = task_title_entry.get()
-        task_description = task_description_entry.get("1.0", "end-1c")
-        task_priority = priority_combobox.get()
-        task_category = category_combobox.get()
-        task_due = due_date_calendar.get_date()
-
-        if task_title:
-            tasks_tree.insert("", "end", values=(task_title, task_category, task_priority, task_due))
-            add_task_window.destroy()
-
-    def add_placeholder_text(event):
-        if task_description_entry.get("1.0", "end-1c") == "":
-            task_description_entry.insert("1.0", "Description")
-            task_description_entry.configure(fg_color="#6c757d")
-
-    def remove_placeholder_text(event):
-        if task_description_entry.get("1.0", "end-1c") == "Description":
-            task_description_entry.delete("1.0", "end")
-            task_description_entry.configure(fg_color="#6c757d")
-
-    add_task_window = ctk.CTkToplevel(root)
-    add_task_window.title("Add New Task")
-    add_task_window.geometry("400x600")
-    add_task_window.grab_set()  # Ensures focus remains on this window
-    add_task_window.attributes("-topmost", True)  # Keeps the window on top
-
-    task_title_entry = ctk.CTkEntry(add_task_window, width=300, placeholder_text="Task Title")
-    task_title_entry.pack(pady=10)
-
-    task_description_entry = ctk.CTkTextbox(add_task_window, width=300, height=100)
-    task_description_entry.pack(pady=5)
-    task_description_entry.insert("1.0", "Description")
-    task_description_entry.configure(fg_color="#6c757d")
-    task_description_entry.bind("<FocusIn>", remove_placeholder_text)
-    task_description_entry.bind("<FocusOut>", add_placeholder_text)
-
-    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Low", "Medium", "High"])
-    priority_combobox.set("Select Priority")
-    priority_combobox.pack(pady=5)
-
-    category_combobox = ctk.CTkComboBox(add_task_window, values=["Work", "Study", "Personal Life"])
-    category_combobox.set("Select Category")
-    category_combobox.pack(pady=5)
-
-    due_date_calendar = Calendar(add_task_window, selectmode='day')
-    due_date_calendar.pack(pady=5)
-
-    ctk.CTkButton(add_task_window, text="Save Task", command=save_task, fg_color="#4B0082").pack(pady=20)
+import sqlite3
+from functions import open_add_task_window, open_task_details_window, initialize_database, load_tasks
 
 # Main application window
 ctk.set_appearance_mode("dark")
@@ -61,12 +11,19 @@ root = ctk.CTk()
 root.title("TaskMaster")
 root.geometry("800x600")
 
-# Add Task Button
-add_task_button = ctk.CTkButton(root, text="Add Task", command=open_add_task_window, fg_color="#4B0082", text_color="#FFFFFF")
+# Initialize database
+initialize_database()
+
+# Tab view for different sections
+tab_view = ctk.CTkTabview(root)
+tab_view.pack(fill="both", expand=True)
+
+# Tasks Tab
+tasks_tab = tab_view.add("Tasks")
+add_task_button = ctk.CTkButton(tasks_tab, text="Add Task", command=lambda: open_add_task_window(tasks_tree, root), fg_color="#4B0082", text_color="#FFFFFF")
 add_task_button.pack(pady=10)
 
-# Task list section
-tasks_frame = ctk.CTkFrame(root, fg_color="#2C2C2C")
+tasks_frame = ctk.CTkFrame(tasks_tab, fg_color="#2C2C2C")
 tasks_frame.pack(pady=10, fill="both", expand=True, padx=10)
 
 # Using ttk.Treeview for task list
@@ -76,7 +33,30 @@ tasks_tree.heading("Category", text="Category")
 tasks_tree.heading("Priority", text="Priority")
 tasks_tree.heading("Due", text="Due")
 
+def sort_column(tree, col, reverse):
+    data = [(tree.set(child, col), child) for child in tree.get_children('')]
+    data.sort(reverse=reverse)
+
+    for index, (val, child) in enumerate(data):
+        tree.move(child, '', index)
+
+    tree.heading(col, command=lambda: sort_column(tree, col, not reverse))
+
+tasks_tree.heading("Task", text="Task", command=lambda: sort_column(tasks_tree, "Task", False))
+tasks_tree.heading("Category", text="Category", command=lambda: sort_column(tasks_tree, "Category", False))
+tasks_tree.heading("Priority", text="Priority", command=lambda: sort_column(tasks_tree, "Priority", False))
+tasks_tree.heading("Due", text="Due", command=lambda: sort_column(tasks_tree, "Due", False))
+
 tasks_tree.pack(fill="both", expand=True)
+
+# Double-click to open task details
+def on_task_double_click(event):
+    selected_item = tasks_tree.selection()
+    if selected_item:
+        task_title = tasks_tree.item(selected_item, 'values')[0]
+        open_task_details_window(tasks_tree, root, task_title)
+
+tasks_tree.bind("<Double-1>", on_task_double_click)
 
 # Apply dark theme to Treeview
 style = ttk.Style()
@@ -85,6 +65,19 @@ style.configure("Treeview", background="#3C3C3C", foreground="#FFFFFF", fieldbac
 style.configure("Treeview.Heading", background="#4B0082", foreground="#FFFFFF")
 style.map("Treeview.Heading", background=[("active", "#4B0082")], foreground=[("active", "#FFFFFF")])
 style.map("Treeview", background=[("selected", "#4B0082")], foreground=[("selected", "#FFFFFF")])
+
+# Load tasks from database
+load_tasks(tasks_tree)
+
+# Matrix Tab
+matrix_tab = tab_view.add("Matrix")
+matrix_label = ctk.CTkLabel(matrix_tab, text="Eisenhower Matrix (Coming soon)", anchor="center", text_color="#FFFFFF")
+matrix_label.pack(fill="both", expand=True, pady=20)
+
+# Today Tab
+today_tab = tab_view.add("Today")
+today_label = ctk.CTkLabel(today_tab, text="Today's Tasks (Coming soon)", anchor="center", text_color="#FFFFFF")
+today_label.pack(fill="both", expand=True, pady=20)
 
 # Start application
 root.mainloop()
