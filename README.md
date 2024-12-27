@@ -67,7 +67,7 @@ Step-by-step instructions to set up the project:
 ## Usage
 
 If app is running you shoul see window:
-![main window](figs/main_app "Main app window")
+![main window](./figs/main_app.png "Main app window")
 
 
 ```bash
