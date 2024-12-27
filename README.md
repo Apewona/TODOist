@@ -66,52 +66,42 @@ Step-by-step instructions to set up the project:
 
 ## Usage
 
-If app is running you shoul see window:
-![main window](./figs/main_app.png "Main app window")
+If the app is running, you should see a window where all tasks are displayed:
 
+![Main window](./figs/main_app.png "Main app window")
 
-```bash
-python main.py --option value
-```
+- To create a new task, click the **ADD TASK** button. Then, you should see the task creation window:
 
-Explain options, parameters, or configurations.
+  ![Create](./figs/add_new.png "Add new task window")
+
+- To delete a task, select it from the list and click the **DELETE** button.
+- To edit a task, double-click on a task from the list. Then, you should see the task editing window:
+
+  ![Edit](./figs/edit.png "Edition window")
+
+Tasks are automatically distributed through the Eisenhower Matrix in the **MATRIX** tab:
+
+![Matrix](./figs/matrix_window.png "Eisenhower Matrix window")
+
+If you need to manage the Eisenhower task distribution, you can double-click on a task and change its Eisenhower placement.
 
 ---
 
 ## Technologies Used
 
-List the main technologies, frameworks, or libraries:
-- Python
-- Flask
-- SQLite
-- CustomTkinter
-
----
-
-## Contributing
-
-Guidelines for contributing to the project:
-
-1. Fork the repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add your message here"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Create a pull request.
+- **Programming Language**: Python 3.12.8
+- **Frameworks and Libraries**:
+  - CustomTkinter and tkinter (for GUI design)
+  - SQLite (for database management)
+  - SpaCy (for text vectorization)
+  - Pickle (for model serialization)
+  - Support Vector Machine (SVM) for classification
+- **Additional Tools**:
+  - tkcalendar (for interactive calendar)
 
 ---
 
 ## License
-
-Specify the license under which the project is distributed:
 
 This project is licensed under the [MIT License](LICENSE).
 
@@ -119,10 +109,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-Provide contact information:
-
-- Author: Your Name
-- Email: your.email@example.com
+Contact information:
 - GitHub: [username](https://github.com/username)
 
 ---
