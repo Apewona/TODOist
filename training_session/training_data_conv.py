@@ -31,11 +31,7 @@ def process_text_file(file_path):
                 if len(items) >= 4:
                     data.append(items)
 
-        df = pd.DataFrame(data, columns=["Title", "Description", "Priority", "Category"])
-        df["DayTillDue"] = df["Priority"].apply(lambda _: random.randint(-10, 30))
-        df["ResultEisenhower"] = df.apply(
-            lambda row: assign_result(row["Priority"], row["DayTillDue"]), axis=1
-        )
+        df = pd.DataFrame(data, columns=["Title", "Description", "Priority", "Category","DayTillDue","ResultEisenhower"])
         return df
     except FileNotFoundError:
         print(f"Error: File {file_path} not found.")
@@ -44,15 +40,6 @@ def process_text_file(file_path):
         print(f"Error processing file: {e}")
         return pd.DataFrame()
 
-# Funkcja przypisująca kategorię w macierzy Eisenhowera
-def assign_result(priority, day_till_due):
-    if day_till_due <= 7:
-        return "Do Now"
-    if priority == "High":
-        return "Schedule"
-    if priority == "Medium":
-        return "Delegate"
-    return "Delete"
 
 # Główne wykonanie
 if __name__ == "__main__":
@@ -70,6 +57,9 @@ if __name__ == "__main__":
     # One-hot encoding dla kolumn 'Priority' i 'Category'
     encoder = OneHotEncoder(sparse_output=False)
     priority_category_encoded = encoder.fit_transform(df[["Priority", "Category"]])
+
+    # Przekształcenie 'DayTillDue' na liczby
+    df["DayTillDue"] = pd.to_numeric(df["DayTillDue"], errors="coerce").fillna(0).astype(int)
 
     # Przekształcenie 'DayTillDue' na macierz sparse
     day_till_due = df["DayTillDue"].values.reshape(-1, 1)

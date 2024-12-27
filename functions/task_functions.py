@@ -76,7 +76,7 @@ def open_add_task_window(tasks_tree, root, vectorizer, encoder, svm_model, label
     task_description_entry.bind("<FocusIn>", remove_placeholder_text)
     task_description_entry.bind("<FocusOut>", add_placeholder_text)
 
-    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Lowest", "Low", "Medium", "High", "Highest"])
+    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Low", "Medium", "High", "Highest"])
     priority_combobox.set("Medium")
     priority_combobox.pack(pady=5)
 
@@ -111,66 +111,17 @@ def save_task_to_db(title, description, priority, category, due_date, day_differ
     print(result)
     connection = sqlite3.connect("tasks.db")
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO tasks (title, description, priority, category, due_date, day_difference) VALUES (?, ?, ?, ?, ?, ?)",
-                   (title, description, priority, category, due_date, day_difference))
+    cursor.execute("INSERT INTO tasks (title, description, priority, category, due_date, day_difference, result) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                   (title, description, priority, category, due_date, day_difference, result))
     connection.commit()
     connection.close()
 
-def update_task_in_db(task_id, title, description, priority, category, due_date):
+def update_task_in_db(task_id, title, description, priority, category, due_date, result):
     connection = sqlite3.connect("tasks.db")
     cursor = connection.cursor()
-    cursor.execute("UPDATE tasks SET title = ?, description = ?, priority = ?, category = ?, due_date = ? WHERE id = ?",
-                   (title, description, priority, category, due_date, task_id))
+    cursor.execute("UPDATE tasks SET title = ?, description = ?, priority = ?, category = ?, due_date = ?, result = ? WHERE id = ?",
+                   (title, description, priority, category, due_date, result, task_id))
     connection.commit()
     connection.close()
 
-def open_task_details_window(tasks_tree,root,task_title):
-    connection = sqlite3.connect("tasks.db")
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM tasks WHERE title = ?", (task_title,))
-    task = cursor.fetchone()
-    connection.close()
 
-    if task:
-        def save_edits():
-            updated_title = task_title_entry.get()
-            updated_description = task_description_entry.get("1.0", "end-1c")
-            updated_priority = priority_combobox.get()
-            updated_category = category_combobox.get()
-            updated_due_date = due_date_calendar.get_date()
-
-            update_task_in_db(task[0], updated_title, updated_description, updated_priority, updated_category, updated_due_date)
-
-            # Refresh task in Treeview
-            selected_item = tasks_tree.selection()[0]
-            tasks_tree.item(selected_item, values=(updated_title, updated_category, updated_priority, updated_due_date))
-
-            details_window.destroy()
-
-        details_window = ctk.CTkToplevel(root)
-        details_window.title("Task Details")
-        details_window.geometry("400x600")
-        details_window.grab_set()  # Ensures focus remains on this window
-        details_window.attributes("-topmost", True)  # Keeps the window on top
-
-        task_title_entry = ctk.CTkEntry(details_window, width=300)
-        task_title_entry.insert(0, task[1])
-        task_title_entry.pack(pady=10)
-
-        task_description_entry = ctk.CTkTextbox(details_window, width=300, height=100)
-        task_description_entry.insert("1.0", task[2])
-        task_description_entry.pack(pady=10)
-
-        priority_combobox = ctk.CTkComboBox(details_window, values=["Lowest", "Low", "Medium", "High", "Highest"])
-        priority_combobox.set(task[3])
-        priority_combobox.pack(pady=5)
-
-        category_combobox = ctk.CTkComboBox(details_window, values=["Work", "Study", "Personal Life", "Workout"])
-        category_combobox.set(task[4])
-        category_combobox.pack(pady=5)
-
-        due_date_calendar = Calendar(details_window, selectmode='day')
-        due_date_calendar.pack(pady=10)
-        due_date_calendar.selection_set(task[5])
-
-        ctk.CTkButton(details_window, text="Save Changes", command=save_edits, fg_color="#4B0082").pack(pady=20)
