@@ -11,9 +11,8 @@ ToDo-ist is a task manager application designed to help you manage your daily ac
 3. [Installation](#installation)
 4. [Usage](#usage)
 5. [Technologies Used](#technologies-used)
-6. [Contributing](#contributing)
-7. [License](#license)
-8. [Contact](#contact)
+6. [License](#license)
+7. [Contact](#contact)
 
 ---
 
@@ -110,6 +109,6 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contact
 
 Contact information:
-- GitHub: [username](https://github.com/username)
+- GitHub: [username](https://github.com/Apewona)
 
 ---
