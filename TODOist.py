@@ -1,8 +1,30 @@
+# -*- coding: utf-8 -*-
 import customtkinter as ctk
 from tkinter import ttk
 import sqlite3
+import pickle
+import spacy
+
+
 from functions import open_add_task_window, open_task_details_window, initialize_database, load_tasks
-# -*- coding: utf-8 -*-
+
+
+# Załaduj model języka polskiego
+nlp = spacy.load("pl_core_news_sm")
+# Tokenizer z obsługą polskich znaków
+def spacy_tokenizer(text):
+    doc = nlp(text)
+    tokens = [token.text for token in doc if not token.is_stop and not token.is_punct]
+    return tokens
+# Load pre-trained model and encoder
+with open("svm_model.pkl", "rb") as model_file:
+    svm_model = pickle.load(model_file)
+
+with open("encoder.pkl", "rb") as encoder_file:
+    label_encoder = pickle.load(encoder_file)
+
+with open("vectorizer.pkl", "rb") as vectorizer_file:
+    vectorizer = pickle.load(vectorizer_file)
 
 # Main application window
 ctk.set_appearance_mode("dark")
@@ -24,7 +46,7 @@ tasks_tab = tab_view.add("Tasks")
 button_frame = ctk.CTkFrame(tasks_tab, fg_color="#2C2C2C")
 button_frame.pack(fill="x", pady=10)
 
-add_task_button = ctk.CTkButton(button_frame, text="Add Task", command=lambda: open_add_task_window(tasks_tree, root), fg_color="#4B0082", text_color="#FFFFFF")
+add_task_button = ctk.CTkButton(button_frame, text="Add Task", command=lambda: open_add_task_window(tasks_tree, root,svm_model,label_encoder,vectorizer), fg_color="#4B0082", text_color="#FFFFFF")
 delete_task_button = ctk.CTkButton(button_frame, text="Delete Task", command=lambda: delete_selected_tasks(tasks_tree), fg_color="#1E1E1E", text_color="#FFFFFF")
 add_task_button.pack(side="left", padx=5)
 delete_task_button.pack(side="left", padx=5)

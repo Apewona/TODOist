@@ -1,17 +1,36 @@
+# -*- coding: utf-8 -*-
+
 import customtkinter as ctk
 from tkcalendar import Calendar
 import sqlite3
-# -*- coding: utf-8 -*-
+from datetime import datetime
 
-# Load tasks from database
+
 def load_tasks(tasks_tree):
     connection = sqlite3.connect("tasks.db")
     cursor = connection.cursor()
-    cursor.execute("SELECT title, category, priority, due_date FROM tasks")
-    tasks = cursor.fetchall()
-    for task in tasks:
-        tasks_tree.insert("", "end", values=task)
-    connection.close()
+    try:
+        # Debug: Sprawdź strukturę bazy danych
+        cursor.execute("PRAGMA table_info(tasks)")
+        print("Tabela tasks:")
+        for column in cursor.fetchall():
+            print(column)
+
+        # Pobieranie danych z bazy
+        cursor.execute("SELECT title, category, priority, due_date FROM tasks")
+        tasks = cursor.fetchall()
+
+        # Debug: Sprawdź pobrane dane
+        print("Pobrane dane z bazy:")
+        print(tasks)
+
+        # Dodawanie danych do TreeView
+        for task in tasks:
+            tasks_tree.insert("", "end", values=task)
+    except Exception as e:
+        print(f"Błąd podczas ładowania zadań: {e}")
+    finally:
+        connection.close()
 
 # Database setup
 def initialize_database():
@@ -32,7 +51,7 @@ def initialize_database():
     connection.commit()
     connection.close()
 
-def open_add_task_window(tasks_tree, root):
+def open_add_task_window(tasks_tree, root,svm_model,label_encoder,vectorizer):
     def save_task():
         task_title = task_title_entry.get()
         task_description = task_description_entry.get("1.0", "end-1c")
@@ -41,7 +60,7 @@ def open_add_task_window(tasks_tree, root):
         task_due = due_date_calendar.get_date()
 
         if task_title:
-            save_task_to_db(task_title, task_description, task_priority, task_category, task_due)
+            save_task_to_db(task_title, task_description, task_priority, task_category, task_due,svm_model,label_encoder,vectorizer)
             tasks_tree.insert("", "end", values=(task_title, task_category, task_priority, task_due))
             add_task_window.destroy()
 
@@ -71,12 +90,12 @@ def open_add_task_window(tasks_tree, root):
     task_description_entry.bind("<FocusIn>", remove_placeholder_text)
     task_description_entry.bind("<FocusOut>", add_placeholder_text)
 
-    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Lowest", "Low", "Medium", "High", "Highest"])
-    priority_combobox.set("Select Priority")
+    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Low", "Medium", "High", "Highest"])
+    priority_combobox.set("Medium")
     priority_combobox.pack(pady=5)
 
     category_combobox = ctk.CTkComboBox(add_task_window, values=["Work", "Study", "Personal Life", "Workout"])
-    category_combobox.set("Select Category")
+    category_combobox.set("Personal Life")
     category_combobox.pack(pady=5)
 
     due_date_calendar = Calendar(add_task_window, selectmode='day')
@@ -85,19 +104,53 @@ def open_add_task_window(tasks_tree, root):
     ctk.CTkButton(add_task_window, text="Save Task", command=save_task, fg_color="#4B0082").pack(pady=20)
 
 # Save a task to the database
-def save_task_to_db(title, description, priority, category, due_date):
-    connection = sqlite3.connect("tasks.db")
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO tasks (title, description, priority, category, due_date) VALUES (?, ?, ?, ?, ?)",
-                   (title, description, priority, category, due_date))
-    connection.commit()
-    connection.close()
+def save_task_to_db(title, description, priority, category, due_date, svm_model, label_encoder, vectorizer):
+    # Weryfikacja, czy wybrano priorytet i kategorię
+    if priority == "Select Priority" or category == "Select Category":
+        print("Error: Priority and Category must be selected.")
+        return
 
-def update_task_in_db(task_id, title, description, priority, category, due_date):
+    # Calculate day_difference
+    try:
+        due_date_obj = datetime.strptime(due_date, "%m/%d/%y")
+        due_date = due_date_obj.strftime("%Y-%m-%d")
+    except ValueError as e:
+        print(f"Error parsing due date: {e}")
+        return
+
+    current_date = datetime.now()
+    day_difference = (due_date_obj - current_date).days
+
+    # Prepare features for classification
+    combined_text = f"{title} {description}"
+    tfidf_vector = vectorizer.transform([combined_text])  # Vectorize text
+    priority_encoded = ["Lowest", "Low", "Medium", "High", "Highest"].index(priority)
+    category_encoded = ["Work", "Study", "Personal Life", "Workout"].index(category)
+
+    # Combine features into a single vector
+    feature_vector = [
+        *tfidf_vector.toarray()[0],  # TF-IDF features
+        priority_encoded,
+        category_encoded,
+        day_difference,
+    ]
+
+    # Dopasowanie do liczby cech modelu
+    if len(feature_vector) != svm_model.n_features_in_:
+        print(f"Feature mismatch: Model expects {svm_model.n_features_in_} features, but got {len(feature_vector)}.")
+        return
+
+    # Predict result
+    result_index = svm_model.predict([feature_vector])[0]
+    result = label_encoder.inverse_transform([result_index])[0]
+
+    # Save task to database
     connection = sqlite3.connect("tasks.db")
     cursor = connection.cursor()
-    cursor.execute("UPDATE tasks SET title = ?, description = ?, priority = ?, category = ?, due_date = ? WHERE id = ?",
-                   (title, description, priority, category, due_date, task_id))
+    cursor.execute("""
+        INSERT INTO tasks (title, description, priority, category, due_date, day_difference, result)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (title, description, priority, category, due_date, day_difference, result))
     connection.commit()
     connection.close()
 
