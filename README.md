@@ -35,7 +35,7 @@ By automating decisions and providing a clear structure, ToDo-ist transforms how
 - **Eisenhower Matrix Integration**: Visual representation of tasks based on urgency and importance.
 - **Customizable Categories**: Supports multiple task categories like Work, Study, Personal Life and Workout.
 - **Calendar Integration**: Set due dates for tasks using an interactive calendar.
-- **User-Friendly Interface**: Built with python.
+- **User-Friendly Interface**: Retro look.
 
 ---
 
@@ -109,6 +109,6 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contact
 
 Contact information:
-- GitHub: [username](https://github.com/Apewona)
+- GitHub: [Apewona](https://github.com/Apewona)
 
 ---
