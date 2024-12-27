@@ -1,1 +1,1 @@
-from .task_functions import open_add_task_window, initialize_database, load_tasks, update_task_in_db
+from .task_functions import initialize_database, load_tasks, update_task_in_db, save_task_to_db

@@ -1,11 +1,11 @@
+# -*- coding: utf-8 -*-
 import customtkinter as ctk
 from tkcalendar import Calendar
 import sqlite3
 from datetime import datetime
 from scipy.sparse import hstack
 import pandas as pd
-# -*- coding: utf-8 -*-
-
+import tkinter as tk
 # Load tasks from database
 def load_tasks(tasks_tree):
     connection = sqlite3.connect("tasks.db")
@@ -35,59 +35,6 @@ def initialize_database():
     connection.commit()
     connection.close()
 
-def open_add_task_window(tasks_tree, root, vectorizer, encoder, svm_model, label_encoder):
-    def save_task():
-        task_title = task_title_entry.get()
-        task_description = task_description_entry.get("1.0", "end-1c")
-        task_priority = priority_combobox.get()
-        task_category = category_combobox.get()
-        task_due = due_date_calendar.get_date()
-        due_date_obj = datetime.strptime(task_due, "%m/%d/%y")
-        current_date = datetime.now()
-        day_difference = (due_date_obj - current_date).days
-        if task_title:
-            save_task_to_db(task_title, task_description, task_priority, task_category, task_due, day_difference, vectorizer, encoder,  svm_model, label_encoder)
-            tasks_tree.insert("", "end", values=(task_title, task_category, task_priority, task_due))
-            add_task_window.destroy()
-
-    def add_placeholder_text(event):
-        if task_description_entry.get("1.0", "end-1c") == "":
-            task_description_entry.insert("1.0", "Description")
-            task_description_entry.configure(fg_color="#6c757d")
-
-    def remove_placeholder_text(event):
-        if task_description_entry.get("1.0", "end-1c") == "Description":
-            task_description_entry.delete("1.0", "end")
-            task_description_entry.configure(fg_color="#6c757d")
-
-    add_task_window = ctk.CTkToplevel(root)
-    add_task_window.title("Add New Task")
-    add_task_window.geometry("400x600")
-    add_task_window.grab_set()  # Ensures focus remains on this window
-    add_task_window.attributes("-topmost", True)  # Keeps the window on top
-
-    task_title_entry = ctk.CTkEntry(add_task_window, width=300, placeholder_text="Task Title")
-    task_title_entry.pack(pady=10)
-
-    task_description_entry = ctk.CTkTextbox(add_task_window, width=300, height=100)
-    task_description_entry.pack(pady=5)
-    task_description_entry.insert("1.0", "Description")
-    task_description_entry.configure(fg_color="#6c757d")
-    task_description_entry.bind("<FocusIn>", remove_placeholder_text)
-    task_description_entry.bind("<FocusOut>", add_placeholder_text)
-
-    priority_combobox = ctk.CTkComboBox(add_task_window, values=["Low", "Medium", "High", "Highest"])
-    priority_combobox.set("Medium")
-    priority_combobox.pack(pady=5)
-
-    category_combobox = ctk.CTkComboBox(add_task_window, values=["Work", "Study", "Personal Life", "Workout"])
-    category_combobox.set("Study")
-    category_combobox.pack(pady=5)
-
-    due_date_calendar = Calendar(add_task_window, selectmode='day')
-    due_date_calendar.pack(pady=5)
-
-    ctk.CTkButton(add_task_window, text="Save Task", command=save_task, fg_color="#4B0082").pack(pady=20)
 
 # Save a task to the database
 def save_task_to_db(title, description, priority, category, due_date, day_difference, vectorizer, encoder, svm_model, label_encoder):
