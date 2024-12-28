@@ -1,2 +1,5 @@
 *.py linguist-language=Python
 *.html linguist-vendored
+*.md linguist-vendored
+*.rst linguist-vendored
+*.tex linguist-vendored
