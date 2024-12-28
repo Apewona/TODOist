@@ -7,17 +7,5 @@ Thumbs.db
 # IDEs and editors
 .vscode/
 .idea/
-# Temporary files and logs
-*.log
-*.tmp
-*.bak
-# Python dependencies
-__pycache__/
-*.py[cod]
-*.pyo
-# Compiled code
-*.so
-*.dll
-*.exe
-*.o
-*.out
+
+
