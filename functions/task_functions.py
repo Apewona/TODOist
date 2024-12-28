@@ -55,7 +55,6 @@ def save_task_to_db(title, description, priority, category, due_date, day_differ
     # Klasyfikacja wyniku za pomocą modelu SVM
     result_index = svm_model.predict([feature_vector])[0]
     result = label_encoder.inverse_transform([result_index])[0]
-    print(result)
     connection = sqlite3.connect("tasks.db")
     cursor = connection.cursor()
     cursor.execute("INSERT INTO tasks (title, description, priority, category, due_date, day_difference, result) VALUES (?, ?, ?, ?, ?, ?, ?)",
