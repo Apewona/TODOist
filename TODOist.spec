@@ -32,7 +32,9 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='E:\\Repo\\TODOist\\icon.ico',  
 )
+
 coll = COLLECT(
     exe,
     a.binaries,

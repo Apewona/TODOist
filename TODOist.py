@@ -50,6 +50,7 @@ ctk.set_default_color_theme("dark-blue")
 root = ctk.CTk()
 root.title("TO-DO-ist")
 root.geometry("1000x700")
+root.iconbitmap("icon.ico")
 root.configure(fg_color=BG_COLOR)
 
 global_font = ctk.CTkFont(family="Consolas", size=15, weight="bold")

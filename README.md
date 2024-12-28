@@ -38,6 +38,31 @@ By automating decisions and providing a clear structure, ToDo-ist transforms how
 - **User-Friendly Interface**: Retro look.
 
 ---
+### Non-Python User Installation – Using the `.exe` File
+
+Follow these steps to install and use the app without needing Python:
+
+1. **Download the Project**  
+   - Go to the repository's main page.  
+   - Click on the **Code** button and select **Download ZIP** to download the project files.  
+     ![Download](./figs/download.png "Download Example")
+
+2. **Locate the App**  
+   - Extract the downloaded ZIP file to a location of your choice.  
+   - Open the extracted folder and navigate to the `dist` directory.  
+   - Inside the `dist` directory, you’ll find a folder named `TODOist`.
+
+3. **Copy the App Folder**  
+   - To make the app easy to use, copy the entire `TODOist` folder from the `dist` directory to any location where you want to store the application.  
+     Example:  
+     ![Step 1](./figs/step1.png "Locate TODOist Folder")  
+     ![Step 2](./figs/step2.png "Copy TODOist Folder")  
+     ![Step 3](./figs/step3.png "Paste TODOist Folder")
+
+4. **Run the Application**  
+   - Open the `TODOist` folder and double-click on `TODOist.exe` to launch the application.
+
+Feel free to use the app without any additional setup! If you encounter any issues, refer to the documentation or contact the developer.
 
 ## Installation
 
