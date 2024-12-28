@@ -23,7 +23,7 @@ BG_COLOR = "#fdebd3"
 
 # Load language model and classifiers -----------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
-nlp = spacy.load("pl_core_news_sm")
+nlp = spacy.load("./pl_core_news_sm-3.8.0")
 
 def spacy_tokenizer(text):
     doc = nlp(text)
